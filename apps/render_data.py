@@ -156,18 +156,29 @@ def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im
     if not os.path.exists(mesh_file):
         print('ERROR: obj file does not exist!!', mesh_file)
         return 
+    else:
+        print('HERE: will use obj file %s' % mesh_file)
+    
     prt_file = os.path.join(folder_name, 'bounce', 'bounce0.txt')
     if not os.path.exists(prt_file):
         print('ERROR: prt file does not exist!!!', prt_file)
         return
+    else:
+        print('HERE: will use prt file %s' % prt_file)
+
     face_prt_file = os.path.join(folder_name, 'bounce', 'face.npy')
     if not os.path.exists(face_prt_file):
         print('ERROR: face prt file does not exist!!!', prt_file)
         return
+    else:
+        print('HERE: will use face_prt file %s' % face_prt_file)
+
     text_file = os.path.join(folder_name, 'tex', subject_name + '_dif_2k.jpg')
     if not os.path.exists(text_file):
         print('ERROR: dif file does not exist!!', text_file)
-        return             
+        return
+    else:
+        print('HERE: will use texture file %s' % text_file)             
 
     texture_image = cv2.imread(text_file)
     texture_image = cv2.cvtColor(texture_image, cv2.COLOR_BGR2RGB)
