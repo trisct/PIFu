@@ -117,7 +117,7 @@ Warning: the following code becomes extremely slow without [pyembree](https://gi
 python -m apps.train_shape --dataroot {path_to_training_data} --random_flip --random_scale --random_trans
 ```
 
-2. run the following script to train the color module. 
+2. run the following script to train the color module.
 ```
 python -m apps.train_color --dataroot {path_to_training_data} --num_sample_inout 0 --num_sample_color 5000 --sigma 0.1 --random_flip --random_scale --random_trans
 ```

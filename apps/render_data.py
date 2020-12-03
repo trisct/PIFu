@@ -147,12 +147,17 @@ def rotateBand2(x, R):
 def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im_size, angl_step=4, n_light=1, pitch=[0]):
     cam = Camera(width=im_size, height=im_size)
     cam.ortho_ratio = 0.4 * (512 / im_size)
-    cam.near = -100
-    cam.far = 100
+
+    ###### range of the mesh visible is specified here
+    # default: -100 ~ 100
+    cam.near = -200
+    cam.far = 200
+    ######
+
     cam.sanity_check()
 
     # set path for obj, prt
-    mesh_file = os.path.join(folder_name, subject_name + '_100k.obj')
+    mesh_file = os.path.join(folder_name, subject_name + '.obj')
     if not os.path.exists(mesh_file):
         print('ERROR: obj file does not exist!!', mesh_file)
         return 
@@ -173,7 +178,7 @@ def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im
     else:
         print('HERE: will use face_prt file %s' % face_prt_file)
 
-    text_file = os.path.join(folder_name, 'tex', subject_name + '_dif_2k.jpg')
+    text_file = os.path.join(folder_name, subject_name + '.jpg')
     if not os.path.exists(text_file):
         print('ERROR: dif file does not exist!!', text_file)
         return
@@ -196,8 +201,18 @@ def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im
     rndr_uv.set_norm_mat(y_scale, vmed)
 
     tan, bitan = compute_tangent(vertices, faces, normals, textures, face_textures)
+    
+    ###### prt loading
+    # this has a potential problem if the mesh is low-poly
+    # a large area would have the same texture and the output would appear broken
+    # using a all-one tensor instead gets rid of the prt effects
     prt = np.loadtxt(prt_file)
     face_prt = np.load(face_prt_file)
+    print(face_prt.shape)
+    ###### thinking of adding an arg to make this optional
+
+
+    face_prt = np.ones_like(face_prt)
     rndr.set_mesh(vertices, faces, normals, faces_normals, textures, face_textures, prt, face_prt, tan, bitan)    
     rndr.set_albedo(texture_image)
 
@@ -295,7 +310,8 @@ if __name__ == '__main__':
     rndr = PRTRender(width=args.size, height=args.size, ms_rate=args.ms_rate, egl=args.egl)
     rndr_uv = PRTRender(width=args.size, height=args.size, uv_mode=True, egl=args.egl)
 
+
     if args.input[-1] == '/':
         args.input = args.input[:-1]
-    subject_name = args.input.split('/')[-1][:-4]
+    subject_name = args.input.split('/')[-1]
     render_prt_ortho(args.out_dir, args.input, subject_name, shs, rndr, rndr_uv, args.size, 1, 1, pitch=[0])

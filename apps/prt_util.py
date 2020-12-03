@@ -125,8 +125,8 @@ def computePRT(mesh_path, n, order):
 def testPRT(dir_path, n=40):
     if dir_path[-1] == '/':
         dir_path = dir_path[:-1]
-    sub_name = dir_path.split('/')[-1][:-4]
-    obj_path = os.path.join(dir_path, sub_name + '_100k.obj')
+    sub_name = dir_path.split('/')[-1]
+    obj_path = os.path.join(dir_path, sub_name + '.obj')
     os.makedirs(os.path.join(dir_path, 'bounce'), exist_ok=True)
 
     PRT, F = computePRT(obj_path, n, 2)
@@ -135,8 +135,8 @@ def testPRT(dir_path, n=40):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input', type=str, default='/home/shunsuke/Downloads/rp_dennis_posed_004_OBJ')
+    parser.add_argument('-i', '--input', type=str)
     parser.add_argument('-n', '--n_sample', type=int, default=40, help='squared root of number of sampling. the higher, the more accurate, but slower')
     args = parser.parse_args()
 
-    testPRT(args.input)
+    testPRT(args.input, args.n_sample)
