@@ -145,13 +145,36 @@ def rotateBand2(x, R):
     return dst
 
 def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im_size, angl_step=4, n_light=1, pitch=[0]):
+    """
+    out_path:
+        output path of the rendered images and baked textures.
+    folder_name:
+        input path
+    subject_name:
+        subject name
+    shs:
+        ???
+    rndr:
+        ???
+    rndr_uv:
+        ???
+    im_size:
+        ???
+    angle_step:
+        ???
+    n_light:
+        ???
+    pitch:
+        ???
+
+    """
     cam = Camera(width=im_size, height=im_size)
-    cam.ortho_ratio = 0.4 * (512 / im_size)
+    cam.ortho_ratio = 0.4 * (512 / im_size) # what does this mean?
 
     ###### range of the mesh visible is specified here
     # default: -100 ~ 100
-    cam.near = -200
-    cam.far = 200
+    cam.near = -100
+    cam.far = 100
     ######
 
     cam.sanity_check()
@@ -162,43 +185,73 @@ def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im
         print('ERROR: obj file does not exist!!', mesh_file)
         return 
     else:
-        print('HERE: will use obj file %s' % mesh_file)
+        print('[HERE] will use obj file %s' % mesh_file)
     
+
     prt_file = os.path.join(folder_name, 'bounce', 'bounce0.txt')
     if not os.path.exists(prt_file):
         print('ERROR: prt file does not exist!!!', prt_file)
         return
     else:
-        print('HERE: will use prt file %s' % prt_file)
+        print('[HERE] will use prt file %s' % prt_file)
 
     face_prt_file = os.path.join(folder_name, 'bounce', 'face.npy')
-    if not os.path.exists(face_prt_file):
-        print('ERROR: face prt file does not exist!!!', prt_file)
-        return
-    else:
-        print('HERE: will use face_prt file %s' % face_prt_file)
+
+    if args.use_prt:
+        if not os.path.exists(face_prt_file):
+            print('ERROR: face prt file does not exist!!!', prt_file)
+            return
+        else:
+            print('[HERE] you have specified usr_prt.')
+            print('[HERE] will use face_prt file %s' % face_prt_file)
 
     text_file = os.path.join(folder_name, subject_name + '.jpg')
     if not os.path.exists(text_file):
         print('ERROR: dif file does not exist!!', text_file)
         return
     else:
-        print('HERE: will use texture file %s' % text_file)             
+        print('[HERE] will use texture file %s' % text_file)
+    
+    ### path setting done
 
     texture_image = cv2.imread(text_file)
     texture_image = cv2.cvtColor(texture_image, cv2.COLOR_BGR2RGB)
 
     vertices, faces, normals, faces_normals, textures, face_textures = load_obj_mesh(mesh_file, with_normal=True, with_texture=True)
-    vmin = vertices.min(0)
-    vmax = vertices.max(0)
-    up_axis = 1 if (vmax-vmin).argmax() == 1 else 2
-    
-    vmed = np.median(vertices, 0)
-    vmed[up_axis] = 0.5*(vmax[up_axis]+vmin[up_axis])
-    y_scale = 180/(vmax[up_axis] - vmin[up_axis])
 
-    rndr.set_norm_mat(y_scale, vmed)
-    rndr_uv.set_norm_mat(y_scale, vmed)
+    # vertices are of the shape [N_v, 3]
+    vmin = vertices.min(0) # so this has shape [3], and it denotes the min coord value in 3 dimensions.
+    vmax = vertices.max(0)
+
+    # up_axis is the axis that we are looking direction at!
+    # but it seems to choose only from 1 and 2, i.e. y and z
+    # up_axis = 1 if (vmax-vmin).argmax() == 1 else 2
+    up_axis = 2 # always set to z
+    # but there remains the problem of orientation (somehow the bikes are upside down)
+    # I can confirm that orientation problem is caused by the generation of rotation matrices below
+    # orientation is fixed below, by adding an additional a 180-degree rotations to the z axis.
+
+    longest_axis = 0 if (vmax-vmin).argmax() == 0 else 1
+
+    # what is vmed?
+    # this does scaling
+    # why median not mean?
+    vmed = np.median(vertices, 0)
+    # the up_axis is set to have median as the mean of two farthes points.
+    vmed[longest_axis] = 0.5*(vmax[longest_axis]+vmin[longest_axis])
+    # this scales the up_axis to 180?
+    # called 'y_scale' supposedly because renderpeople faces up
+    # why 180 ???
+    # BECAUSE the near-far range is -100~100, so 180 takes 90% of the range!!!
+    #y_scale = 180/(vmax[up_axis] - vmin[up_axis])
+    longest_scale = 180 / (vmax[longest_axis] - vmin[longest_axis])
+
+    # are these cameras?
+    # these two lines normalizes the coordinates according to vmed and y_scale, by setting two normalization matrices.
+    # original scaling was done by y_scale.
+    # but for bikes, need to change to longest_axis scale.
+    rndr.set_norm_mat(longest_scale, vmed)
+    rndr_uv.set_norm_mat(longest_scale, vmed)
 
     tan, bitan = compute_tangent(vertices, faces, normals, textures, face_textures)
     
@@ -206,13 +259,14 @@ def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im
     # this has a potential problem if the mesh is low-poly
     # a large area would have the same texture and the output would appear broken
     # using a all-one tensor instead gets rid of the prt effects
-    prt = np.loadtxt(prt_file)
+    prt = np.loadtxt(prt_file) # what does this do?
+    print(prt.shape) # [???, 9]
     face_prt = np.load(face_prt_file)
-    print(face_prt.shape)
-    ###### thinking of adding an arg to make this optional
-
-
-    face_prt = np.ones_like(face_prt)
+    #print('face_prt shape = ', face_prt.shape) # same as faces.shape
+    if not args.use_prt:
+        face_prt = np.ones_like(faces)
+    ######
+    
     rndr.set_mesh(vertices, faces, normals, faces_normals, textures, face_textures, prt, face_prt, tan, bitan)    
     rndr.set_albedo(texture_image)
 
@@ -239,9 +293,11 @@ def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im
 
     for p in pitch:
         for y in tqdm(range(0, 360, angl_step)):
+            # y is the angle in degrees
+            # y goes through 0~360 (integers)
             R = np.matmul(make_rotate(math.radians(p), 0, 0), make_rotate(0, math.radians(y), 0))
             if up_axis == 2:
-                R = np.matmul(R, make_rotate(math.radians(90),0,0))
+                R = np.matmul(R, make_rotate(math.radians(90),0,math.radians(180)))
 
             rndr.rot_matrix = R
             rndr_uv.rot_matrix = R
@@ -254,7 +310,7 @@ def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im
                 sh_angle = 0.2*np.pi*(random.random()-0.5)
                 sh = rotateSH(sh, make_rotate(0, sh_angle, 0).T)
 
-                dic = {'sh': sh, 'ortho_ratio': cam.ortho_ratio, 'scale': y_scale, 'center': vmed, 'R': R}
+                dic = {'sh': sh, 'ortho_ratio': cam.ortho_ratio, 'scale': longest_scale, 'center': vmed, 'R': R}
                 
                 rndr.set_sh(sh)        
                 rndr.analytic = False
@@ -300,6 +356,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--ms_rate', type=int, default=1, help='higher ms rate results in less aliased output. MESA renderer only supports ms_rate=1.')
     parser.add_argument('-e', '--egl',  action='store_true', help='egl rendering option. use this when rendering with headless server with NVIDIA GPU')
     parser.add_argument('-s', '--size',  type=int, default=512, help='rendering image size')
+    parser.add_argument('--use_prt', action='store_true', help='use prt')
     args = parser.parse_args()
 
     # NOTE: GL context has to be created before any other OpenGL function loads.

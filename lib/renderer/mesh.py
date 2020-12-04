@@ -169,6 +169,17 @@ def load_obj_mesh_mtl(mesh_file):
     
 
 def load_obj_mesh(mesh_file, with_normal=False, with_texture=False):
+    """
+    This is a self written mesh importer.
+    
+    It imports mesh by parsing an OBJ file. Only the commands 'v', 'vn', 'vt', 'f' are dealt with. It converts the mesh to a vectex list and a face list.
+
+    It returns the vertex list and the face list.
+
+    If with_normal is true, it returns normals as well.
+
+    If with_texture is true, it returns uv data as well.
+    """
     vertex_data = []
     norm_data = []
     uv_data = []
@@ -250,18 +261,36 @@ def load_obj_mesh(mesh_file, with_normal=False, with_texture=False):
         else:
             norms = normalize_v3(norms)
             face_normals = np.array(face_norm_data) - 1
+        print('[HERE] In load_obj_mesh: vertices shape', vertices.shape)
+        print('[HERE] In load_obj_mesh: faces shape', faces.shape)
+        print('[HERE] In load_obj_mesh: norms shape', norms.shape)
+        print('[HERE] In load_obj_mesh: face_normals shape', face_normals.shape)
+        print('[HERE] In load_obj_mesh: uvs shape', uvs.shape)
+        print('[HERE] In load_obj_mesh: face_uvs shape', face_uvs.shape)
         return vertices, faces, norms, face_normals, uvs, face_uvs
 
     if with_texture:
         uvs = np.array(uv_data)
         face_uvs = np.array(face_uv_data) - 1
+        print('[HERE] In load_obj_mesh: vertices shape', vertices.shape)
+        print('[HERE] In load_obj_mesh: faces shape', faces.shape)
+        print('[HERE] In load_obj_mesh: uvs shape', uvs.shape)
+        print('[HERE] In load_obj_mesh: face_uvs shape', face_uvs.shape)
         return vertices, faces, uvs, face_uvs
 
     if with_normal:
         norms = np.array(norm_data)
         norms = normalize_v3(norms)
         face_normals = np.array(face_norm_data) - 1
+        print('[HERE] In load_obj_mesh: vertices shape', vertices.shape)
+        print('[HERE] In load_obj_mesh: faces shape', faces.shape)
+        print('[HERE] In load_obj_mesh: norms shape', norms.shape)
+        print('[HERE] In load_obj_mesh: face_normals shape', face_normals.shape)
         return vertices, faces, norms, face_normals
+
+    
+    print('[HERE] In load_obj_mesh: vertices shape', vertices.shape)
+    print('[HERE] In load_obj_mesh: faces shape', faces.shape)
 
     return vertices, faces
 
