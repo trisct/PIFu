@@ -84,8 +84,32 @@ def getSHCoeffs(order, phi, theta):
     
     return np.stack(shs, 1)
 
+
+def as_mesh(scene_or_mesh):
+    """
+    Convert a possible scene to a mesh.
+
+    If conversion occurs, the returned mesh has only vertex and face data.
+    """
+    if isinstance(scene_or_mesh, trimesh.Scene):
+        if len(scene_or_mesh.geometry) == 0:
+            mesh = None  # empty scene
+        else:
+            # we lose texture information here
+            mesh = trimesh.util.concatenate(
+                tuple(trimesh.Trimesh(vertices=g.vertices, faces=g.faces)
+                    for g in scene_or_mesh.geometry.values()))
+    else:
+        assert(isinstance(scene_or_mesh, trimesh.Trimesh))
+        mesh = scene_or_mesh
+    return mesh
+
 def computePRT(mesh_path, n, order):
     mesh = trimesh.load(mesh_path, process=False)
+
+    mesh = as_mesh(mesh)
+
+
     vectors_orig, phi, theta = sampleSphericalDirections(n)
     SH_orig = getSHCoeffs(order, phi, theta)
 

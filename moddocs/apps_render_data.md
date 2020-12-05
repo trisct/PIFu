@@ -32,9 +32,9 @@ if not args.use_prt:
 ###### thinking of adding an arg to make this optional
 ```
 
-### 2. Object orientation, coordinate normalization and rotations during rendering
+### 2. Object orientation, coordinate normalization and rotations during rendering (2020/12/05)
 
-Object orientation in rendering is set by `up_axis`, which defines what axis is used to point 'up' during rendering. RenderPeople dataset usually have the y-axis pointint up. But bike models usually have the z-axis pointing up. So I changed up_axis manually to z-axis-up always.
+Object orientation in rendering is set by `up_axis`, which defines what axis is used to point 'up' during rendering. RenderPeople dataset usually have the y-axis pointint up. But bike models usually have the z-axis pointing up. I added an argument `-u` or `--up_axis` to speficy the up axis (default: 2).
 
 Coodinate normalization is set is the renderer as a normalization matrix, by calling `rndr.set_norm_mat` and `rndr_uv.set_norm_mat`. The scaling it was originally set along the y-axis, i.e. the longest axis of a person. But for bike models, the longest axis is not facing up! So I added a `longest_axis` instead of using `up_axis`. The scaling target is 180, because the near-far range is by default -100~100, so 180 takes up 90% of the range.
 
@@ -42,9 +42,9 @@ Somehow the orientation is wrong even after changing `up_axis` to 2. This is cau
 
 ### 3. Cutoff range
 
-This app has a min-max range of visible vertices along the direction of the sight. This is approximately at lines 151-155. One might need to set a larger range for some long bikes. The default range is `near = -100` and `far = 100`. 
+This app has a min-max range of visible vertices along the direction of the sight. One might need to set a larger range for some long bikes. The default range is `near = -100` and `far = 100`. 
 
-Modified part:
+Corresponding code:
 ```
 ###### range of the mesh visible is specified here
 # default: -100 ~ 100
@@ -52,3 +52,9 @@ cam.near = -100
 cam.far = 100
 ######
 ```
+
+I left this untouched as this is solved in resetting `longest_axis`
+
+### 4. Only want JPG for texture (2020/12/05)
+
+Fixed by adding support for PNG.

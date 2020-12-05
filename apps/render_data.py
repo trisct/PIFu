@@ -207,6 +207,8 @@ def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im
 
     text_file = os.path.join(folder_name, subject_name + '.jpg')
     if not os.path.exists(text_file):
+        text_file = os.path.join(folder_name, subject_name + '.png')
+    if not os.path.exists(text_file):
         print('ERROR: dif file does not exist!!', text_file)
         return
     else:
@@ -226,12 +228,12 @@ def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im
     # up_axis is the axis that we are looking direction at!
     # but it seems to choose only from 1 and 2, i.e. y and z
     # up_axis = 1 if (vmax-vmin).argmax() == 1 else 2
-    up_axis = 2 # always set to z
+    up_axis = args.up_axis # always set to z
     # but there remains the problem of orientation (somehow the bikes are upside down)
     # I can confirm that orientation problem is caused by the generation of rotation matrices below
     # orientation is fixed below, by adding an additional a 180-degree rotations to the z axis.
 
-    longest_axis = 0 if (vmax-vmin).argmax() == 0 else 1
+    longest_axis = (vmax-vmin).argmax()
 
     # what is vmed?
     # this does scaling
@@ -262,9 +264,14 @@ def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im
     prt = np.loadtxt(prt_file) # what does this do?
     print(prt.shape) # [???, 9]
     face_prt = np.load(face_prt_file)
+
+    prt_mean = prt.mean()
+    prt_var = ((prt - prt_mean) ** 2).mean()
+    print('prt mean = %.8f, prt var = %.8f' % (prt_mean, prt_var))
+    #print(face_prt)
     #print('face_prt shape = ', face_prt.shape) # same as faces.shape
     if not args.use_prt:
-        face_prt = np.ones_like(faces)
+        prt = np.random.randn(*(prt.shape)) * 0.01 + args.pm
     ######
     
     rndr.set_mesh(vertices, faces, normals, faces_normals, textures, face_textures, prt, face_prt, tan, bitan)    
@@ -356,7 +363,9 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--ms_rate', type=int, default=1, help='higher ms rate results in less aliased output. MESA renderer only supports ms_rate=1.')
     parser.add_argument('-e', '--egl',  action='store_true', help='egl rendering option. use this when rendering with headless server with NVIDIA GPU')
     parser.add_argument('-s', '--size',  type=int, default=512, help='rendering image size')
-    parser.add_argument('--use_prt', action='store_true', help='use prt')
+    parser.add_argument('-p', '--use_prt', action='store_true', help='use prt')
+    parser.add_argument('-u', '--up_axis', type=int, default=2, help='specify up axis')
+    parser.add_argument('--pm', type=int, default=.5, help='mean value of prt array if not using prt')
     args = parser.parse_args()
 
     # NOTE: GL context has to be created before any other OpenGL function loads.

@@ -13,13 +13,33 @@ import logging
 log = logging.getLogger('trimesh')
 log.setLevel(40)
 
+def as_mesh(scene_or_mesh):
+    """
+    Convert a possible scene to a mesh.
+
+    If conversion occurs, the returned mesh has only vertex and face data.
+    """
+    if isinstance(scene_or_mesh, trimesh.Scene):
+        if len(scene_or_mesh.geometry) == 0:
+            mesh = None  # empty scene
+        else:
+            # we lose texture information here
+            mesh = trimesh.util.concatenate(
+                tuple(trimesh.Trimesh(vertices=g.vertices, faces=g.faces)
+                    for g in scene_or_mesh.geometry.values()))
+    else:
+        assert(isinstance(scene_or_mesh, trimesh.Trimesh))
+        mesh = scene_or_mesh
+    return mesh
+
 def load_trimesh(root_dir):
     folders = os.listdir(root_dir)
     meshs = {}
     for i, f in enumerate(folders):
         sub_name = f
-        meshs[sub_name] = trimesh.load(os.path.join(root_dir, f, '%s_100k.obj' % sub_name))
-
+        mesh = trimesh.load(os.path.join(root_dir, f, '%s.obj' % sub_name))
+        mesh = as_mesh(mesh)
+        meshs[sub_name] = mesh
     return meshs
 
 def save_samples_truncted_prob(fname, points, prob):
@@ -100,6 +120,7 @@ class TrainDataset(Dataset):
     def get_subjects(self):
         all_subjects = os.listdir(self.RENDER)
         var_subjects = np.loadtxt(os.path.join(self.root, 'val.txt'), dtype=str)
+        # dont you mean val subjects?
         if len(var_subjects) == 0:
             return all_subjects
 
