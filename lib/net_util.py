@@ -56,7 +56,7 @@ def gen_mesh(opt, net, cuda, data, save_path, use_octree=True):
     b_min = data['b_min']
     b_max = data['b_max']
     try:
-        save_img_path = save_path[:-4] + '.png'
+        save_img_path = save_path[:-4] + '.png' # [:-4] gets rid of .obj suffix
         save_img_list = []
         for v in range(image_tensor.shape[0]):
             save_img = (np.transpose(image_tensor[v].detach().cpu().numpy(), (1, 2, 0)) * 0.5 + 0.5)[:, :, ::-1] * 255.0

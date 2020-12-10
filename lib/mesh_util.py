@@ -41,6 +41,7 @@ def reconstruction(net, cuda, calib_tensor,
         sdf = eval_grid(coords, eval_func, num_samples=num_samples)
 
     # Finally we do marching cubes
+    #print(sdf)
     try:
         verts, faces, normals, values = measure.marching_cubes_lewiner(sdf, 0.5)
         # transform verts into world coordinate system
