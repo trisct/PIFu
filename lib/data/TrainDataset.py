@@ -271,8 +271,9 @@ class TrainDataset(Dataset):
             np.random.seed(1991)
             torch.manual_seed(1991)
         mesh = self.mesh_dic[subject]
-        print('[HERE: In TrainDataset] mesh_dic = ', self.mesh_dic.keys())
-        print('[HERE: In TrainDataset] subject = ', subject)
+        if self.opt.debug:
+            print('[HERE: In TrainDataset] mesh_dic = ', self.mesh_dic.keys())
+            print('[HERE: In TrainDataset] subject = ', subject)
         surface_points, _ = trimesh.sample.sample_surface(mesh, 4 * self.num_sample_inout)
         sample_points = surface_points + np.random.normal(scale=self.opt.sigma, size=surface_points.shape)
 
@@ -287,21 +288,23 @@ class TrainDataset(Dataset):
         inside_points = sample_points[inside]
         outside_points = sample_points[np.logical_not(inside)]
 
+        # only the designated samples remains
         nin = inside_points.shape[0]
-        inside_points = inside_points[
-                        :self.num_sample_inout // 2] if nin > self.num_sample_inout // 2 else inside_points
-        outside_points = outside_points[
-                         :self.num_sample_inout // 2] if nin > self.num_sample_inout // 2 else outside_points[
-                                                                                               :(self.num_sample_inout - nin)]
+        inside_points = inside_points[:self.num_sample_inout // 2] if nin > self.num_sample_inout // 2\
+            else inside_points
+        outside_points = outside_points[:self.num_sample_inout // 2] if nin > self.num_sample_inout // 2\
+            else outside_points[:(self.num_sample_inout - nin)]
 
+        # inside ones are set to 1 while the others set to 0
         samples = np.concatenate([inside_points, outside_points], 0).T
         labels = np.concatenate([np.ones((1, inside_points.shape[0])), np.zeros((1, outside_points.shape[0]))], 1)
         
-        print('[HERE: In TrainDataset] samples shape:', samples.shape)
-        print('[HERE: In TrainDataset] inside_points shape:', inside_points.shape)
-        print('[HERE: In TrainDataset] outside_points shape:', outside_points.shape)
+        if self.opt.debug:
+            print('[HERE: In TrainDataset] samples shape:', samples.shape)
+            print('[HERE: In TrainDataset] inside_points shape:', inside_points.shape)
+            print('[HERE: In TrainDataset] outside_points shape:', outside_points.shape)
 
-        print('[HERE: In TrainDataset] label shape:', labels.shape)
+            print('[HERE: In TrainDataset] label shape:', labels.shape)
 
         # save_samples_truncted_prob('out.ply', samples.T, labels.T)
         # exit()

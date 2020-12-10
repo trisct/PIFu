@@ -91,30 +91,42 @@ def train(opt):
             iter_start_time = time.time()
 
             # print data information
-            print('[HERE: In train_shape] data_keys:', train_data.keys())
+            if opt.debug:
+                print('[HERE: In train_shape] data_keys:', train_data.keys())
 
-            # retrieve the data
+                # retrieve the data
             image_tensor = train_data['img'].to(device=cuda)
             calib_tensor = train_data['calib'].to(device=cuda)
             sample_tensor = train_data['samples'].to(device=cuda)
 
-            print('-----printing tensor shapes-----')
-            print('image tensor shape = ', image_tensor.shape)
-            print('calib tensor shape = ', calib_tensor.shape)
-            #print(calib_tensor)
-            print('sample tensor shape = ', sample_tensor.shape)
+            if opt.debug:
+                print('-----printing tensor shapes-----')
+
+                print('[HERE: In train_shape] name tensor len = ', len(train_data['name']))
+                print('[HERE: In train_shape] image tensor shape = ', image_tensor.shape)
+                print('[HERE: In train_shape] calib tensor shape = ', calib_tensor.shape)
+                print('[HERE: In train_shape] sample tensor shape = ', sample_tensor.shape)
 
             image_tensor, calib_tensor = reshape_multiview_tensors(image_tensor, calib_tensor)
-            print('image tensor reshaped = ', image_tensor.shape)
-            print('calib tensor reshaped = ', calib_tensor.shape)
+            
+            if opt.debug:
+                print('[HERE: In train_shape] image tensor reshaped = ', image_tensor.shape)
+                print('[HERE: In train_shape] calib tensor reshaped = ', calib_tensor.shape)
 
             if opt.num_views > 1:
                 sample_tensor = reshape_sample_tensor(sample_tensor, opt.num_views)
 
             label_tensor = train_data['labels'].to(device=cuda)
 
-            print('label tensor shape = ', label_tensor.shape)
-            print('-----printing tensor shapes done-----')
+            if opt.debug:
+                print('[HERE: In train_shape] label tensor shape = ', label_tensor.shape)
+
+                print('[HERE: In train_shape] subject name = %s'%train_data['name'][0])
+                print('[HERE: In train_shape] sample point (min, max) x-coord = %.4f, %.4f'%(sample_tensor[0,0].min(), sample_tensor[0,0].max()))
+                print('[HERE: In train_shape] sample point (min, max) y-coord = %.4f, %.4f'%(sample_tensor[0,1].min(), sample_tensor[0,1].max()))
+                print('[HERE: In train_shape] sample point (min, max) z-coord = %.4f, %.4f'%(sample_tensor[0,2].min(), sample_tensor[0,2].max()))
+            
+                print('-----printing tensor shapes done-----')
 
             res, error = netG.forward(image_tensor, sample_tensor, calib_tensor, labels=label_tensor)
 
@@ -128,7 +140,7 @@ def train(opt):
 
             if train_idx % opt.freq_plot == 0:
                 print(
-                    'Name: {0} | Epoch: {1} | {2}/{3} | Err: {4:.06f} | LR: {5:.06f} | Sigma: {6:.02f} | dataT: {7:.05f} | netT: {8:.05f} | ETA: {9:02d}:{10:02d}'.format(
+                    'Name: {0} | Epoch: {1} | {2}/{3} | Err: {4:.06f} | LR: {5:.06f} | Sigma: {6:.02f} | data time: {7:.05f} | net time: {8:.05f} | ETA: {9:02d}:{10:02d}'.format(
                         opt.name, epoch, train_idx, len(train_data_loader), error.item(), lr, opt.sigma,
                                                                             iter_start_time - iter_data_time,
                                                                             iter_net_time - iter_start_time, int(eta // 60),

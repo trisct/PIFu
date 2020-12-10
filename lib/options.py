@@ -55,7 +55,7 @@ class BaseOptions():
 
         # Sampling related
         g_sample = parser.add_argument_group('Sampling')
-        g_sample.add_argument('--sigma', type=float, default=5.0, help='perturbation standard deviation for positions')
+        g_sample.add_argument('--sigma', type=float, default=2.5, help='perturbation standard deviation for positions')
 
         g_sample.add_argument('--num_sample_inout', type=int, default=5000, help='# of sampling points')
         g_sample.add_argument('--num_sample_color', type=int, default=0, help='# of sampling points')
@@ -116,6 +116,7 @@ class BaseOptions():
         parser.add_argument('--mask_path', type=str, help='path for input mask')
         parser.add_argument('--img_path', type=str, help='path for input image')
 
+
         # aug
         group_aug = parser.add_argument_group('aug')
         group_aug.add_argument('--aug_alstd', type=float, default=0.0, help='augmentation pca lighting alpha std')
@@ -124,6 +125,8 @@ class BaseOptions():
         group_aug.add_argument('--aug_sat', type=float, default=0.0, help='augmentation saturation')
         group_aug.add_argument('--aug_hue', type=float, default=0.0, help='augmentation hue')
         group_aug.add_argument('--aug_blur', type=float, default=0.0, help='augmentation blur')
+
+        #parser.add_argument('--debug', action='store_true', help='show debug image')
 
         # special tasks
         self.initialized = True
