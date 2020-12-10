@@ -90,17 +90,31 @@ def train(opt):
         for train_idx, train_data in enumerate(train_data_loader):
             iter_start_time = time.time()
 
+            # print data information
+            print('[HERE: In train_shape] data_keys:', train_data.keys())
+
             # retrieve the data
             image_tensor = train_data['img'].to(device=cuda)
             calib_tensor = train_data['calib'].to(device=cuda)
             sample_tensor = train_data['samples'].to(device=cuda)
 
+            print('-----printing tensor shapes-----')
+            print('image tensor shape = ', image_tensor.shape)
+            print('calib tensor shape = ', calib_tensor.shape)
+            #print(calib_tensor)
+            print('sample tensor shape = ', sample_tensor.shape)
+
             image_tensor, calib_tensor = reshape_multiview_tensors(image_tensor, calib_tensor)
+            print('image tensor reshaped = ', image_tensor.shape)
+            print('calib tensor reshaped = ', calib_tensor.shape)
 
             if opt.num_views > 1:
                 sample_tensor = reshape_sample_tensor(sample_tensor, opt.num_views)
 
             label_tensor = train_data['labels'].to(device=cuda)
+
+            print('label tensor shape = ', label_tensor.shape)
+            print('-----printing tensor shapes done-----')
 
             res, error = netG.forward(image_tensor, sample_tensor, calib_tensor, labels=label_tensor)
 

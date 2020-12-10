@@ -24,6 +24,7 @@ def orthogonal(points, calibrations, transforms=None):
     :param transforms: [B, 2, 3] Tensor of image transform matrix
     :return: xyz: [B, 3, N] Tensor of xyz coordinates in the image plane
     '''
+    
     rot = calibrations[:, :3, :3]
     trans = calibrations[:, :3, 3:4]
     pts = torch.baddbmm(trans, rot, points)  # [B, 3, N]

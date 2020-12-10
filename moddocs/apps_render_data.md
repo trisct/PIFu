@@ -27,7 +27,7 @@ if args.use_prt:
 prt = np.loadtxt(prt_file)
 face_prt = np.load(face_prt_file)
 print('face_prt shape = ', face_prt.shape)
-if not args.use_prt:    
+if not args.use_prt:
     face_prt = np.ones_like(face_prt)
 ###### thinking of adding an arg to make this optional
 ```

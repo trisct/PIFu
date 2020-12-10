@@ -106,9 +106,7 @@ def as_mesh(scene_or_mesh):
 
 def computePRT(mesh_path, n, order):
     mesh = trimesh.load(mesh_path, process=False)
-
     mesh = as_mesh(mesh)
-
 
     vectors_orig, phi, theta = sampleSphericalDirections(n)
     SH_orig = getSHCoeffs(order, phi, theta)
