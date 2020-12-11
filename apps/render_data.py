@@ -144,7 +144,7 @@ def rotateBand2(x, R):
 
     return dst
 
-def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im_size, angl_step=4, n_light=1, pitch=[0]):
+def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im_size, angl_step=4, n_light=1, pitch=[0], yaw=(0,360)):
     """
     out_path:
         output path of the rendered images and baked textures.
@@ -299,7 +299,7 @@ def render_prt_ortho(out_path, folder_name, subject_name, shs, rndr, rndr_uv, im
     os.system(cmd)
 
     for p in pitch:
-        for y in tqdm(range(0, 360, angl_step)):
+        for y in tqdm(range(yaw[0], yaw[1], angl_step)):
             # y is the angle in degrees
             # y goes through 0~360 (integers)
             R = np.matmul(make_rotate(math.radians(p), 0, 0), make_rotate(0, math.radians(y), 0))
@@ -366,6 +366,8 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--use_prt', action='store_true', help='use prt')
     parser.add_argument('-u', '--up_axis', type=int, default=2, help='specify up axis')
     parser.add_argument('--pm', type=int, default=.5, help='mean value of prt array if not using prt')
+    parser.add_argument('--yaw_low', type=int, default=0, help='yaw range lower bound')
+    parser.add_argument('--yaw_high', type=int, default=360, help='yaw range upper bound')
     args = parser.parse_args()
 
     # NOTE: GL context has to be created before any other OpenGL function loads.
@@ -380,4 +382,4 @@ if __name__ == '__main__':
     if args.input[-1] == '/':
         args.input = args.input[:-1]
     subject_name = args.input.split('/')[-1]
-    render_prt_ortho(args.out_dir, args.input, subject_name, shs, rndr, rndr_uv, args.size, 1, 1, pitch=[0])
+    render_prt_ortho(args.out_dir, args.input, subject_name, shs, rndr, rndr_uv, args.size, 1, 1, pitch=[0], yaw=(args.yaw_low, args.yaw_high))

@@ -99,7 +99,7 @@ class TrainDataset(Dataset):
         self.num_sample_inout = self.opt.num_sample_inout
         self.num_sample_color = self.opt.num_sample_color
 
-        self.yaw_list = list(range(0,360,1))
+        self.yaw_list = list(range(self.opt.yaw_low,self.opt.yaw_high,1))
         self.pitch_list = [0]
         self.subjects = self.get_subjects()
 

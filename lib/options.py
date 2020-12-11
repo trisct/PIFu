@@ -128,6 +128,8 @@ class BaseOptions():
 
         #parser.add_argument('--debug', action='store_true', help='show debug image')
         parser.add_argument('--projection_mode', type=str, default='orthogonal', help='projection mode')
+        parser.add_argument('--yaw_low', type=int, default=0, help='yaw range lower bound')
+        parser.add_argument('--yaw_high', type=int, default=360, help='yaw range upper bound')
 
         # special tasks
         self.initialized = True
