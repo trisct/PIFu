@@ -127,6 +127,7 @@ class BaseOptions():
         group_aug.add_argument('--aug_blur', type=float, default=0.0, help='augmentation blur')
 
         #parser.add_argument('--debug', action='store_true', help='show debug image')
+        parser.add_argument('--projection_mode', type=str, default='orthogonal', help='projection mode')
 
         # special tasks
         self.initialized = True

@@ -74,7 +74,8 @@ class TrainDataset(Dataset):
 
     def __init__(self, opt, phase='train'):
         self.opt = opt
-        self.projection_mode = 'orthogonal'
+        self.projection_mode = opt.projection_mode # 'orthogonal'
+        print('using projection mode = %s' % opt.projection_mode)
 
         # Path setup
         self.root = self.opt.dataroot
