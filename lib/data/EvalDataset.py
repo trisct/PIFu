@@ -18,7 +18,8 @@ class EvalDataset(Dataset):
 
     def __init__(self, opt, root=None):
         self.opt = opt
-        self.projection_mode = 'orthogonal'
+        self.projection_mode = opt.projection_mode
+        print('[HERE: In EvalDataset] using projection mode = %s' % opt.projection_mode)
 
         # Path setup
         self.root = self.opt.dataroot

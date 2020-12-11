@@ -16,7 +16,8 @@ class BaseDataset(Dataset):
     def __init__(self, opt, phase='train'):
         self.opt = opt
         self.is_train = self.phase == 'train'
-        self.projection_mode = 'orthogonal'  # Declare projection mode here
+        self.projection_mode = opt.projection_mode  # Declare projection mode here
+        print('[HERE: In BaseDataset] using projection mode = %s' % opt.projection_mode)
 
     def __len__(self):
         return 0
