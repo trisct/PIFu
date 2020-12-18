@@ -364,7 +364,7 @@ if __name__ == '__main__':
     parser.add_argument('-e', '--egl',  action='store_true', help='egl rendering option. use this when rendering with headless server with NVIDIA GPU')
     parser.add_argument('-s', '--size',  type=int, default=512, help='rendering image size')
     parser.add_argument('-p', '--use_prt', action='store_true', help='use prt')
-    parser.add_argument('-u', '--up_axis', type=int, default=2, help='specify up axis')
+    parser.add_argument('-u', '--up_axis', type=int, default=1, help='specify up axis')
     parser.add_argument('--pm', type=int, default=.5, help='mean value of prt array if not using prt')
     parser.add_argument('--yaw_low', type=int, default=0, help='yaw range lower bound')
     parser.add_argument('--yaw_high', type=int, default=360, help='yaw range upper bound')
@@ -382,4 +382,4 @@ if __name__ == '__main__':
     if args.input[-1] == '/':
         args.input = args.input[:-1]
     subject_name = args.input.split('/')[-1]
-    render_prt_ortho(args.out_dir, args.input, subject_name, shs, rndr, rndr_uv, args.size, 1, 1, pitch=[0], yaw=(args.yaw_low, args.yaw_high))
+    render_prt_ortho(args.out_dir, args.input, subject_name, shs, rndr, rndr_uv, args.size, 1, 1, pitch=[-45,-30,-15,0,15,30,45,60], yaw=(args.yaw_low, args.yaw_high))

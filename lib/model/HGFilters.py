@@ -107,8 +107,13 @@ class HGFilter(nn.Module):
                                                                  256, kernel_size=1, stride=1, padding=0))
 
     def forward(self, x):
+        if self.opt.debug:
+            print('[HERE: In lib/model/HGFilters] -----entering a forward pass of HGFilters-----')
+            print('[HERE: In lib/model/HGFilters] input.shape:', x.shape)
         x = F.relu(self.bn1(self.conv1(x)), True)
         tmpx = x
+        if self.opt.debug:
+            print('[HERE: In lib/model/HGFilters] tempx.shape:', tmpx.shape)
         if self.opt.hg_down == 'ave_pool':
             x = F.avg_pool2d(self.conv2(x), 2, stride=2)
         elif self.opt.hg_down in ['conv64', 'conv128']:
@@ -118,11 +123,15 @@ class HGFilter(nn.Module):
             raise NameError('Unknown Fan Filter setting!')
 
         normx = x
+        if self.opt.debug:
+            print('[HERE: In lib/model/HGFilters] normx.shape:', normx.shape)
 
         x = self.conv3(x)
         x = self.conv4(x)
 
         previous = x
+        if self.opt.debug:
+            print('[HERE: In lib/model/HGFilters] previous.shape:', previous.shape)
 
         outputs = []
         for i in range(self.num_modules):
@@ -142,5 +151,12 @@ class HGFilter(nn.Module):
                 ll = self._modules['bl' + str(i)](ll)
                 tmp_out_ = self._modules['al' + str(i)](tmp_out)
                 previous = previous + ll + tmp_out_
+
+        if self.opt.debug:
+            print('[HERE: In lib/model/HGFilters] len(outputs):', len(outputs))
+            for i, out in enumerate(outputs):
+                print('[HERE: In lib/model/HGFilters] outputs[%d].shape:'%i, outputs[i].shape)
+        
+            print('[HERE: In lib/model/HGFilters] -----exiting a forward pass of HGFilters-----')
 
         return outputs, tmpx.detach(), normx
