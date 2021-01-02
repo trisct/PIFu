@@ -100,7 +100,7 @@ class TrainDataset(Dataset):
         self.num_sample_color = self.opt.num_sample_color
 
         self.yaw_list = list(range(self.opt.yaw_low,self.opt.yaw_high,1))
-        self.pitch_list = [10,20,30,40,50,60]
+        self.pitch_list = [0,10,20,30,40,50,60]
         self.pitch_list = eval(opt.pitches)
         self.subjects = self.get_subjects()
 

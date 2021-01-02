@@ -382,4 +382,4 @@ if __name__ == '__main__':
     if args.input[-1] == '/':
         args.input = args.input[:-1]
     subject_name = args.input.split('/')[-1]
-    render_prt_ortho(args.out_dir, args.input, subject_name, shs, rndr, rndr_uv, args.size, 1, 1, pitch=[10,20,30,40,50,60], yaw=(args.yaw_low, args.yaw_high))
+    render_prt_ortho(args.out_dir, args.input, subject_name, shs, rndr, rndr_uv, args.size, 1, 1, pitch=[0,10,20,30,40,50,60], yaw=(args.yaw_low, args.yaw_high))
