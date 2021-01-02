@@ -100,7 +100,11 @@ class TrainDataset(Dataset):
         self.num_sample_color = self.opt.num_sample_color
 
         self.yaw_list = list(range(self.opt.yaw_low,self.opt.yaw_high,1))
+<<<<<<< HEAD
         self.pitch_list = [10,20,30,40,50,60]
+=======
+        self.pitch_list = eval(opt.pitches)
+>>>>>>> 13e5145906771b349a5c6a87fc5bdf6c7abfbfc4
         self.subjects = self.get_subjects()
 
         # PIL to tensor

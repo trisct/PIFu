@@ -130,6 +130,7 @@ class BaseOptions():
         parser.add_argument('--projection_mode', type=str, default='orthogonal', help='projection mode')
         parser.add_argument('--yaw_low', type=int, default=0, help='yaw range lower bound')
         parser.add_argument('--yaw_high', type=int, default=360, help='yaw range upper bound')
+        parser.add_argument('--pitches', type=str, default="(0,)", help='pitch list, use commas.')
 
         # special tasks
         self.initialized = True
