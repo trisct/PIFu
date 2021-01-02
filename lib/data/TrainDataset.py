@@ -279,18 +279,22 @@ class TrainDataset(Dataset):
         surface_points, _ = trimesh.sample.sample_surface(mesh, 4 * self.num_sample_inout)
         sample_points = surface_points + np.random.normal(scale=self.opt.sigma, size=surface_points.shape)
 
-        # add random points within image space
+        # add random points to sampled points within image space
         length = self.B_MAX - self.B_MIN
         random_points = np.random.rand(self.num_sample_inout // 4, 3) * length + self.B_MIN
         sample_points = np.concatenate([sample_points, random_points], 0)
         np.random.shuffle(sample_points)
 
         # inside mesh is done by "mesh.contains"
+        if self.opt.debug:
+            print('[HERE: In TrainDataset] Determining inside/outside points')
         inside = mesh.contains(sample_points)
         inside_points = sample_points[inside]
         outside_points = sample_points[np.logical_not(inside)]
 
         # only the designated samples remains
+        if self.opt.debug:
+            print('[HERE: In TrainDataset] Trying to select the valid sample points.')
         nin = inside_points.shape[0]
         inside_points = inside_points[:self.num_sample_inout // 2] if nin > self.num_sample_inout // 2\
             else inside_points

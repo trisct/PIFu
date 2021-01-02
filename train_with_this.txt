@@ -1,1 +1,0 @@
-python -m apps.train_shape_resnet --dataroot training_data/ --random_flip --random_scale --random_trans --checkpoints_path bike_resnet_hori --results_path bike_resnet_hori_visres
