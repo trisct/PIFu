@@ -2,7 +2,7 @@
 set -ex
 
 # Training
-GPU_ID=2
+GPU_ID=0
 DISPLAY_ID=$((GPU_ID*10+10))
 NAME='pifu_90'
 
@@ -16,7 +16,7 @@ MLP_DIM_COLOR='513 1024 512 256 128 3'
 # NOTE: one can change here to reconstruct mesh in a different resolution.
 VOL_RES=256
 
-CHECKPOINTS_NETG_PATH='./bike_90/example/netG_epoch_40'
+CHECKPOINTS_NETG_PATH='./trained_models/20210110_upperpitch_hg_netG_epoch_46'
 CHECKPOINTS_NETC_PATH='./checkpoints/example/netC_epoch_0'
 
 TEST_FOLDER_PATH='./sample_images'
