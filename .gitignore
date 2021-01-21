@@ -1,1 +1,8 @@
 checkpoints/*
+
+*.tar
+
+*.png
+*.jpg
+
+__pycache__/

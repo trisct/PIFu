@@ -4,7 +4,7 @@ set -ex
 # Training
 GPU_ID=0
 DISPLAY_ID=$((GPU_ID*10+10))
-NAME='pifu_90'
+NAME='real_test'
 
 # Network configuration
 
@@ -19,7 +19,7 @@ VOL_RES=256
 CHECKPOINTS_NETG_PATH='./trained_models/20210110_upperpitch_hg_netG_epoch_46'
 CHECKPOINTS_NETC_PATH='./checkpoints/example/netC_epoch_0'
 
-TEST_FOLDER_PATH='./sample_images'
+TEST_FOLDER_PATH='./real_test'
 
 # command
 CUDA_VISIBLE_DEVICES=${GPU_ID} python ./apps/eval.py \
